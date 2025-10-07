@@ -9,11 +9,12 @@
         <name>Start Deployment</name>
         <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
 
-/*
-var GetBoolValue = x_snc_devtools.GetBoolValue;
+	var GetBoolValue = x_snc_devtools.GetBoolValue;
 	var IsValidSysId = x_snc_devtools.IsValidSysId
 	var GetStringValue = x_snc_devtools.GetStringValue;
-		
+	var IsValidRecord = x_snc_devtools.IsValidRecord;
+	var IsValidUrl = x_snc_devtools.IsValidUrl;
+			
 	function GetParam(strParam)
 	{
 		var queryParams = request.queryParams;
@@ -35,69 +36,69 @@ var GetBoolValue = x_snc_devtools.GetBoolValue;
 		return;
 	}
 	
-	var strAppSysId = GetParam('application_sys_id');
-	var bStopOnError = GetBoolValue(GetParam('stop_on_error'));
-	var bAsync = GetBoolValue(GetParam('async'));
+	var strInstance = GetStringValue(GetParam('instance'));
+	var strRepoUrl = GetStringValue(GetParam('repo_url'));
+	var strBranch = GetStringValue(GetParam('branch'));
 	
-	var grApp = x_snc_devtools.GetAppRecord(strAppSysId);
-	if (x_snc_devtools.IsValidRecord(grApp) == false)
+	if (strInstance == '')
 	{
-		Error('APP_NOT_FOUND','The specified app cannot be found!');
+		Error('INSTANCE_NOT_SPECIFIED','No instance has been specified!');
+		return;
+	}
+
+
+	var grInstance = GetInstanceRecord(strInstance);
+	if (IsValidRecord(grInstance) == false)
+	{
+		Error('INSTANCE_NOT_FOUND','The specified Instance (configuration) cannot be found!');
+		return;
+	}
+
+	if (strRepoUrl == '')
+	{
+		Error('REPO_URL_NOT_SPECIFIED','No repository URL is specified!');
+		return;
+	}
+
+
+	if (IsValidUrl(strRepoUrl) == false)
+	{
+		Error('REPO_URL_INVALID','The specified Repository URL is invalid!');
 		return;
 	}
 	
-	var dependencies = x_snc_devtools.GetPackageDependencyTree(grApp);
-	//Log(x_snc_devtools.RenderValue(dependencies));
-	if (x_snc_devtools.GetValue(dependencies,'dependency_status_summary') == 'circular')
+	if (strBranch == '')
 	{
-		Error('CIRCULAR_DEPENDENCY','The given app or one of its depenendcies has a circular dependency. Such a circular dependency must be resolved prior to installation.');
+		Error('BRANCH_NOT_SPECIFIED','No branch is specified!');
 		return;
-	}	
+	}
 	
-	if (bAsync == true)
+	
+	var strProgressName = 'Performing headless deployment on instance: '+grInstance.name;
+
+	var params = {};
+	params['strInstance'] = strInstance;
+	params['strRepoUrl'] = strRepoUrl;
+	params['strBranch'] = strBranch;
+	var strWorkerId = x_snc_devtools.StartWorker(
+		strProgressName,
+		'x_snc_deployer.DeployerWorkerAPI',
+		'HeadlessDeployment',
+		params);	
+	
+	if (IsValidSysId(strWorkerId) == false)
 	{
-		var params = {};
-		var strProgressName = 'Running installation scripts for application: '+grApp.name;
-
-		params['strAppSysId'] = GetStringValue(grApp.sys_id);
-		var strWorkerId = x_snc_devtools.StartWorker(
-			strProgressName,
-			'x_snc_devtools.DevToolsWorkerAPI',
-			'InstallApp',
-			params);	
-		
-		if (IsValidSysId(strWorkerId) == false)
-		{
-			Error('ASYNC_START_FAILED','Failed to start running installation scripts asynchronously.');
-			return;
-		}
-		
-		var body = {};
-		body.message = 'SUCCESS';
-		body.detail = 'Started running installation scripts.';
-		body.progress_id = strWorkerId;
-		response.setBody(body);
-		
+		Error('ASYNC_START_FAILED','Failed to start headless deployment asynchronously!');
+		return;
 	}
-	else
-	{
-		var bResult = x_snc_devtools.InstallApp(grApp,bStopOnError);
-
-		if (bResult == false)
-		{
-			Error('INSTALLATION_SCRIPT_FAILED','One of the AppInstall() functions in one of the applications returned an error. Please check the logs on the target instance for details!');
-			return;
-
-		}
-
-		var body = {};
-		body.message = 'SUCCESS';
-		body.detail = 'All AppInstall() scripts have been executed successfully.';
-		response.setBody(body);
-	}
+		
+	var body = {};
+	body.message = 'SUCCESS';
+	body.detail = 'Started headless deployment.';
+	body.progress_id = strWorkerId;
+	response.setBody(body);
 	
 	return;
-	*/
 
 })(request, response);]]></operation_script>
         <operation_uri>/api/x_snc_deployer/controller/start_deployment</operation_uri>
@@ -113,14 +114,14 @@ var GetBoolValue = x_snc_devtools.GetBoolValue;
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2025-10-06 12:44:19</sys_created_on>
         <sys_id>474b22233bdc325062bf612c95e45a2f</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>6</sys_mod_count>
         <sys_name>Start Deployment</sys_name>
         <sys_package display_value="Deployer WORK IN PROGRESS" source="x_snc_deployer">394148f9db1c2d906a03dad1f396197a</sys_package>
         <sys_policy/>
         <sys_scope display_value="Deployer WORK IN PROGRESS">394148f9db1c2d906a03dad1f396197a</sys_scope>
         <sys_update_name>sys_ws_operation_474b22233bdc325062bf612c95e45a2f</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-10-07 13:45:33</sys_updated_on>
+        <sys_updated_on>2025-10-07 14:02:42</sys_updated_on>
         <web_service_definition display_value="Deployer Controller API">36fae2af3b9c325062bf612c95e45aa6</web_service_definition>
         <web_service_version/>
     </sys_ws_operation>
