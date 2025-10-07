@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_snc_deployer.GetInstanceRecord</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Returns the record representing the given Instance based on its Sys ID or the Instance name (as specified in the Instance record). </description>
+        <mobile_callable>false</mobile_callable>
+        <name>GetInstanceRecord</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[function GetInstanceRecord(vInstance)
+{
+	var GetRecord = x_snc_devtools.GetRecord;
+	var GetStringValue = x_snc_devtools.GetStringValue;
+	var IsValidRecord = x_snc_devtools.IsValidRecord;
+
+	var grInstance = GetRecord('x_snc_deployer_instance',vInstance);
+	if (IsValidRecord(grInstance) == true)
+	{
+		return grInstance;
+	}
+	grInstance = new GlideRecord('x_snc_deployer_instance');
+	grInstance.addQuery('name','=',GetStringValue(vInstance));
+	grInstance.query();
+	if (grInstance.getRowCount() != 1)
+	{
+		return false;
+	}
+	grInstance.next();
+	return grInstance;
+}]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-10-07 13:37:09</sys_created_on>
+        <sys_id>e9018c443b24f25062bf612c95e45a98</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>GetInstanceRecord</sys_name>
+        <sys_package display_value="Deployer WORK IN PROGRESS" source="x_snc_deployer">394148f9db1c2d906a03dad1f396197a</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="Deployer WORK IN PROGRESS">394148f9db1c2d906a03dad1f396197a</sys_scope>
+        <sys_update_name>sys_script_include_e9018c443b24f25062bf612c95e45a98</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-10-07 13:39:48</sys_updated_on>
+        <x_snc_devtools_sys_ui_script/>
+    </sys_script_include>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>e9018c443b24f25062bf612c95e45a98</id>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-10-07 13:37:08</sys_created_on>
+        <sys_id>1f01cc443b24f25062bf612c95e45aa7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-10-07 13:37:08</sys_updated_on>
+        <table>sys_script_include</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>
