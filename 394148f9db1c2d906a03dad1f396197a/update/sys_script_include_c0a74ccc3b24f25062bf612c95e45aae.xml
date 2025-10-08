@@ -130,7 +130,7 @@
 		return false;			
 	}
 
-	grDeployment = GetRecord('x_snc_deployer_deployment',grDeployment.sys_id);
+	grDeployment = GetDeploymentRecord(grDeployment.sys_id);
 	if (IsValidRecord(grDeployment) == false)
 	{
 		Error('Failed to re-load deployment record!');
@@ -147,7 +147,8 @@
 	}
 
 	grDeployment.state = GetDeploymentState('ready');
-	GlideRecordUpdate(grDeployment,true);
+	grDeployment.update();
+	//GlideRecordUpdate(grDeployment,true);
 
 	var grTasks = new GlideRecord('x_snc_deployer_deployment_task');
 	grTasks.addQuery('deployment','=',grDeployment.sys_id);
@@ -172,14 +173,27 @@
 	progresstracker.SetText('Performing Deployment...');
 	progresstracker.SetPercentageProgress(35);
 
+	var grDeployment = GetDeploymentRecord(grDeployment.sys_id);
 	grDeployment.state = GetDeploymentState('inprogress');
+	var gdt = new GlideDateTime();
+	grDeployment.work_start = gdt;
 	grDeployment.update();
+
+	var grTask = GetNextPendingDeploymentTaskRecord(grDeployment);
+	if (IsValidRecord(grTask) == false)
+	{
+		Error('No pending tasks found for deployment '+grDeployment.number+'!');
+		return false;			
+	}	
+
+	grTask.state =  GetDeploymentTaskState('inprogress');
+	grTask.update();		
 
 	var bContinue = true;
 	while (bContinue == true)
 	{
 		Sleep(2);
-		grDeployment = GetRecord('x_snc_deployer_deployment',grDeployment.sys_id);
+		var grDeployment = GetDeploymentRecord(grDeployment.sys_id);
 		if (IsValidRecord(grDeployment) == false)
 		{
 			Error('Failed to re-load deployment record!');
@@ -196,19 +210,28 @@
 		}
 	}
 
-	// Determine failure or success
+	var gdt = new GlideDateTime();
 
-	Log(grDeployment.status);
-
-/*
 	// Failure
+	if (IsDeploymentReadyToComplete(grDeployment) == false)
 	{
-		Error('Deployment Failed!');
+		var grDeployment = GetDeploymentRecord(grDeployment.sys_id);
+		grDeployment.state = GetDeploymentState('failed');
+		grDeployment.close_notes = 'Auto-closing deployment '+grDeployment.number+' as at least one task could not be completed.';
+		grDeployment.work_end = gdt;
+		grDeployment.update();		
+		Error('Deployment '+grDeployment.number+' failed: '+grDeployment.status);
 		return false;
 	}
-*/
+
+
 	// Success
-	progresstracker.SetResult(null,true,'Deployment Complete.');
+	var grDeployment = GetDeploymentRecord(grDeployment.sys_id);
+	grDeployment.state = GetDeploymentState('complete');
+	grDeployment.work_end = gdt;
+	grDeployment.update();		
+
+	progresstracker.SetResult(null,true,'Deployment '+grDeployment.number+' complete.');
 
 	return true;
 }]]></script>
@@ -216,14 +239,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2025-10-07 14:06:44</sys_created_on>
         <sys_id>c0a74ccc3b24f25062bf612c95e45aae</sys_id>
-        <sys_mod_count>24</sys_mod_count>
+        <sys_mod_count>36</sys_mod_count>
         <sys_name>HeadlessDeployment</sys_name>
         <sys_package display_value="Deployer WORK IN PROGRESS" source="x_snc_deployer">394148f9db1c2d906a03dad1f396197a</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="Deployer WORK IN PROGRESS">394148f9db1c2d906a03dad1f396197a</sys_scope>
         <sys_update_name>sys_script_include_c0a74ccc3b24f25062bf612c95e45aae</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-10-08 07:59:41</sys_updated_on>
+        <sys_updated_on>2025-10-08 13:50:21</sys_updated_on>
         <x_snc_devtools_sys_ui_script/>
     </sys_script_include>
     <sys_es_latest_script action="INSERT_OR_UPDATE">
