@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_deployer.IsDeploymentTaskExecutionFinished</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Returns true if all deployment tasks for the given deployment are completed, have failed or were skipped or if the deployment is in a completed, failed or cancelled state.</description>
+        <mobile_callable>false</mobile_callable>
+        <name>IsDeploymentTaskExecutionFinished</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[function IsDeploymentTaskExecutionFinished(vDeployment)
+{
+	var GetRecord = x_snc_devtools.GetRecord;
+	var IsValidRecord = x_snc_devtools.IsValidRecord;
+	var GetStringValue = x_snc_devtools.GetStringValue;
+	
+	var grDeployment = GetRecord('x_snc_deployer_deployment',vDeployment);
+	if (IsValidRecord(grDeployment) == false)
+	{
+		return false;
+	}
+
+	if (grDeployment.state == GetDeploymentState('complete'))
+	{
+		return true;
+	}
+	if (grDeployment.state == GetDeploymentState('cancelled'))
+	{
+		return true;
+	}
+	if (grDeployment.state == GetDeploymentState('failed'))
+	{
+		return true;
+	}
+
+
+	if (grDeployment.state != GetDeploymentState('inprogress'))
+	{
+		return false;
+	}
+
+	var aStates = [
+			GetDeploymentTaskState('ready'),
+			GetDeploymentTaskState('pending'),
+			GetDeploymentTaskState('inprogress')
+		];
+
+	var grTask = new GlideRecord('x_snc_deployer_deployment_task');
+	grTask.addQuery('deployment','=',grDeployment.sys_id);
+	grTask.orderBy('order');
+	grTask.addQuery('state','IN',GetStringValue(aStates));
+	grTask.setLimit(1);
+	grTask.query();
+	if (grTask.next())
+	{
+		return false;
+	}
+	return true;
+}]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-10-08 07:41:56</sys_created_on>
+        <sys_id>8e59b7443ba8365062bf612c95e45a11</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>IsDeploymentTaskExecutionFinished</sys_name>
+        <sys_package display_value="Deployer WORK IN PROGRESS" source="x_snc_deployer">394148f9db1c2d906a03dad1f396197a</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Deployer WORK IN PROGRESS">394148f9db1c2d906a03dad1f396197a</sys_scope>
+        <sys_update_name>sys_script_include_8e59b7443ba8365062bf612c95e45a11</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-10-08 08:00:29</sys_updated_on>
+        <x_snc_devtools_sys_ui_script/>
+    </sys_script_include>
+</record_update>
