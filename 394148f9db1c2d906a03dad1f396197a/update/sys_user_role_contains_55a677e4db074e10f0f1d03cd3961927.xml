@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update table="sys_user_role_contains">
     <sys_user_role_contains action="INSERT_OR_UPDATE">
         <contains display_value="security_admin" name="security_admin">b2d8f7130a0a0baa5bf52498ecaadeb4</contains>
-        <role display_value="x_snc_deployer.api" name="x_snc_deployer.api">1d5540581b1965105b76777d8b4bcb3f</role>
+        <role display_value="x_snc_deployer.api_target" name="x_snc_deployer.api_target">1d5540581b1965105b76777d8b4bcb3f</role>
         <sys_class_name>sys_user_role_contains</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-06-24 14:50:37</sys_created_on>

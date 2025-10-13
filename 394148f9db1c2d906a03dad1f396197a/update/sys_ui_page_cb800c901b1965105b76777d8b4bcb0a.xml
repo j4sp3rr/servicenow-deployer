@@ -29,7 +29,7 @@
 		<li><b>Confirm</b>: Data deletion is allowed but must be explicitly confirmed during the deployment.</li>
 		<li><b>Warn</b>: Data deletion is allowed. Users are only warned of data deletion on the Target Instance.</li>
 	</ul>
-	<p>If set up on the development instance, the Deployer can help to protect version braches when they are baselined using DevTools's baseline procedure.</p> 
+	<p>If set up on the development instance, the Deployer can help to protect version branches when they are baselined using DevTools' baseline procedure.</p> 
 	
 	<h3>Supported Source Control Systems</h3>
 	<ul>
@@ -43,15 +43,16 @@
 	<p>Automated Deployment Procedure:</p>
 	<ol>
 		<li>Determining the applications to be installed by creating a Repository Application Status. The availability of all application version branches is checked based on the dependency tree.</li>
-		<li>Install applications and perform CodeSanity checks (Instance Scan) in reverse dependency order. The reverse dependency order is based on the application to be installed and all of its dependencies (and the dependencies of the dependencies). The deepest nodes of the dependency tree are installed first. The application to be installed comes last.</li>
+		<li>Install applications and perform CodeSanity checks (Instance Scan) in reverse dependency order. The reverse dependency order is based on the application to be installed and all its dependencies (and the dependencies of the dependencies). The deepest nodes of the dependency tree are installed first. The application to be installed comes last.</li>
 		<li>Running installation scripts in reverse dependency order.</li>
 		<li>Running all ATF tests in reverse dependency order.</li>
 	</ol>
 
 	<h3>Controller Instance Features</h3>
 	<p>The "Controller Instance" is an instance that is used to run and operate the CICD pipeline - it acts as a control tower.</p>
+	<p>The Deployer app exposes the&#160;<a href="/sys_ws_definition.do?sys_id=36fae2af3b9c325062bf612c95e45aa6" target="_blank">Deployer Controller API</a>&#160;to allow fully automated headless deployments.</p>
 	<p><a href="/x_snc_deployer_repository_credentials_list.do" target="_blank">Repository Credentials</a>&#160;need be configured so that the Deployer can access a public or internal source control system based on the repository url alone. Repository Credentials allow to map credential records with specific repository urls or just fractions of urls to cover multiple repositories.</p>
-	<p>The&#160;<a href="/x_snc_deployer_repository_application_status_list.do" target="_blank">Repository App Status</a>&#160;feature can be used to analyse a given repository and check its readyness for deployment. To access the repositories, the Repository Credentials must be configured.</p>
+	<p>The&#160;<a href="/x_snc_deployer_repository_application_status_list.do" target="_blank">Repository App Status</a>&#160;feature can be used to analyse a given repository and check its readiness for deployment. To access the repositories, the Repository Credentials must be configured.</p>
 	<p>The current state in an application's "dev" branch can also be assessed using the Repository Application Status feature to get a preview of the result for the application before actually baselining it.</p>
 	<p><a href="/x_snc_deployer_instance_list.do" target="_blank">Target Instances</a>&#160;need be configured to enable deployments of applications to these instances. The exact steps performed during a deployment can be configured for each Target Instance - e.g., whether to execute the default ATF Test Suite of each installed application and whether CodeSanity checks should be performed during deployment. Each Target Instance can have a type of either DEV, TEST or PROD.</p>
 	<p><a href="/x_snc_deployer_pipeline_list.do" target="_blank">Pipelines</a>&#160;can be configured to provide an overview on which applications are installed on which instance.</p>
@@ -60,7 +61,7 @@
 		<ul>
 			<li>Installing new applications on Target Instances ("Import from Source Control")</li>
 			<li>Installing new versions of already installed applications on Target Instances ("Switch Branch")</li>
-			<li>Refresh the current version of already installd applications on Target Instances ("Apply Remote Changes")</li>
+			<li>Refresh the current version of already installed applications on Target Instances ("Apply Remote Changes")</li>
 			<li>Running installation scripts on Target Instances</li>
 			<li>Running CodeSanity checks on Target Instances (based on Instance Scan)</li>
 			<li>Running the default ATF Test Suite of applications on target instances</li>
@@ -80,19 +81,19 @@
 
 	<h3>Target Instance Features</h3>
 	<p>The "Target Instance" is an instance to which applications are to be deployed.</p>
-	<p>The Deployer app exposes a REST API to check the status of the Target Instance and to asynchronously execute the installation scripts of an application and all of its dependencies in the correct order.</p>
+	<p>The Deployer app exposes the&#160;<a href="/sys_ws_definition.do?sys_id=2c6640981b1965105b76777d8b4bcb6f" target="_blank">Deployer Target API</a>&#160;to check the status of the Target Instance and to asynchronously execute the installation scripts of an application and all its dependencies in the correct order.</p>
 
 	<h3>Development Instance Features</h3>
 	<p>The "Development Instance" is an instance on which developers make changes to applications and from where new application versions are baselined.</p>
-	<p>The Deployer app "hooks" into DevTools's application baseline procedure (via Extension Point) and protects the newly created version branch.</p> 
+	<p>The Deployer app "hooks" into DevTools' application baseline procedure (via Extension Point) and protects the newly created version branch.</p> 
 
 	<h3>Repository Application Status</h3>
 	<p>The Repository Application Status is a pre-check before the actual deployment starts. The "RAS" determines whether all applications are available in corresponding branches. If the Repository Application Status fails a deployment cannot even be started.</p>
-	<p>The Repository Application Status comes in three flavors - in three "modes":</p>
+	<p>The Repository Application Status comes in three flavours - in three "modes":</p>
 	<ol>
-		<li><b>Deployment</b>: This is to prepare a regular deployment. The given repository url and version determines the exact application version to be installed. Its direct and indirect dependencies will also be installed based on the consolidated minimum version requirements. If any required application version is not present in the source control system the RAS fails and no deployment can be started.</li>
-		<li><b>Preview</b>: A preview looks into the given branch of the given application (identified by the repository url) and then indentifies if all the required dependencies are available in corresponding version branches. No deployment can be triggered based on this Repository Application Status.</li>
-		<li><b>Checkout</b>: A checkout in source control terms is the process of updating an instance based on the state that is stored in the given branch. In this mode the Repository Application Status checks the given application in the given branch and all of its dependencies (using the same given branch). The typical branch for this operation is the "dev" branch. A Deployment based on this kind of Repository Application Status can be used to initialize or reset a DEV instance - e.g. after a clone or (if really everything is captured in apps) to initialize a z-booted instance for development. When creating the Repository Application Status in checkout mode the Deployer does not perform a strict version compatibility check for dependencies - for a checkout it does not matter if versions are compatible.</li>
+		<li><b>Deployment</b>: This is to prepare a regular deployment. The given repository url and version determines the exact application version to be installed. Its direct and indirect dependencies will also be installed based on the consolidated minimum version requirements. If any required application version is not present in the source control system the RAS fails, and no deployment can be started.</li>
+		<li><b>Preview</b>: A preview investigates the given branch of the given application (identified by the repository url) and then identifies if all the required dependencies are available in corresponding version branches. No deployment can be triggered based on this Repository Application Status.</li>
+		<li><b>Checkout</b>: A checkout in source control terms is the process of updating an instance based on the state that is stored in the given branch. In this mode the Repository Application Status checks the given application in the given branch an all its dependencies (using the same given branch). The typical branch for this operation is the "dev" branch. A Deployment based on this kind of Repository Application Status can be used to initialize or reset a DEV instance - e.g. after a clone or (if really everything is captured in apps) to initialize a z-booted instance for development. When creating the Repository Application Status in checkout mode the Deployer does not perform a strict version compatibility check for dependencies - for a checkout it does not matter if versions are compatible.</li>
 	</ol>
 
 	<h2>Disclaimer</h2>
@@ -215,14 +216,29 @@
 	
 	<h2 toc-ignore-children="true">Release Notes</h2>
 
+	<h3>1.22.0 - 2025-10-13</h3>
+	<ol>
+		<li>DevTools 1.133.0 is required due to a fix in DocumentationAPI::RenderRestApi().</li>
+		<li>Introduced the "Deployer Controller API" with the "Start Deployment" endpoint.</li>
+		<li>Added role "x_snc_deployer.api_controller" to provide access to the Deployer Controller API.</li>
+		<li>Role "x_snc_deployer.api" has been renamed to "x_snc_deployer.api_target" to maintain backward compatibility with existing configuration.</li>
+		<li>Added function HeadlessDeployment().</li>
+		<li>Added function GetInstanceRecord().</li>
+		<li>Hardened the API access controls by explicitly checking for the x_snc_deployer.api_target and x_snc_deployer.api_controller roles. An admin user does no longer automatically inherit the privilege to request the APIs.</li>
+		<li>For unclear reasons, synchronous HTTP requests are prevented for non-admin users in synchronous business rules. This prevents non-admins from "preparing" a deployment. The quick fix is to assign the admin role to x_snc_deployer.manager (which is a temporary solution) - the actual solution is to perform the "Prepare" step as a lengthy operation in the background (with progress bar in the GUI). This has been documented as a technical debt.</li>
+		<li>The parameter "repo_url" in the "Get Credential" end point is now marked as required.</li>
+		<li>Updated the documentation of System Property "x_snc_deployer.active".</li>
+	</ol>
+
+
 	<h3>1.21.0 - 2025-09-15</h3>
 	<ol>
-		<li>DevTools 1.132.0 is required due to the cross scope issue with SourceControlCoolDown() and Zurich support.</li>
+		<li>DevTools 1.132.0 is required due to the cross-scope issue with SourceControlCoolDown() and Zurich support.</li>
 		<li>Xanadu is no longer actively supported.</li>
 		<li>Deployer has been fully tested with Zurich.</li>
 		<li>A defect in the applicaton status end point led to non-detection of already installed applications when preparing a deployment and to empty rows in the Pipeline status if there are App Customizations present on the target instance. This has been fixed (in GetApplicationStatus()).</li>
 		<li>When creating a Repository Application Status in "Checkout" mode the Deployer no longer performs a strict version compatibility check for dependencies - for a checkout it does not matter if versions are compatible.</li>
-		<li>Added the UI Action "Ignore Failure" to ignore a failed task execution and proceed with the next task. The Deployment as a whole can then only be marked as failed.</li>
+		<li>Added the UI Action "Ignore Failure" to ignore a failed task execution and proceed with the next task. The Deployment can then only be marked as failed.</li>
 		<li>The "Repository Application Status" form now also displays the Updated date and time.</li>
 		<li>More manual tasks now contain instructions on how to perform them.</li>
 		<li>Added ACL to protect client calls to DeployerClientAPI.</li>
@@ -236,12 +252,12 @@
 		<li>Washington is no longer actively supported.</li>
 		<li>Deployer has been fully tested with Yokohama.</li>
 		<li>The Deployment Task "Run Installation Scripts" now contains a link to the syslog on the Target Instance showing the results of the installation script execution.</li>
-		<li>The "Updated" field is now displayed on the Deploment Task form.</li>
+		<li>The "Updated" field is now displayed on the Deployment Task form.</li>
 		<li>On the Deployment Task form, the "Assigned to" field is now read only when the task is no longer in progress.</li>
 		<li>Improved display value of Repository Application Status while processing.</li>
 		<li>Fixed a display issue in GetDeploymentTasks() when creating tasks to import an application from source control.</li> 
 		<li>When creating a Repository Application Status, the form did sometimes not reload properly to reflect the current status of processing. This has been improved.</li>
-		<li>Before conducting remote source control operations on the Target Instance, Deployer waits for the defined amount of seconds as specified in system property "x_snc_devtools.sourcecontrol.cooldown.seconds" (on the Controller Instance). This is to avoid race conditions if a previous source control operation has not yet been completely finished (although reported as if). Note that this is an experimental feature which may change depending on real world observaton.</li>
+		<li>Before conducting remote source control operations on the Target Instance, Deployer waits for the defined number of seconds as specified in system property "x_snc_devtools.sourcecontrol.cooldown.seconds" (on the Controller Instance). This is to avoid race conditions if a previous source control operation has not yet been completely finished (although reported as if). Note that this is an experimental feature which may change depending on real world observation.</li>
 	</ol>
 
 
@@ -262,7 +278,7 @@
 	<h3>1.18.0 - 2025-01-27</h3>
 	<ol>
 		<li>DevTools 1.112.0 is now required due to full AzueDevOps support.</li>
-		<li>Deployer is now more strict with versions: When creating a Repository Application Status, the exact version requested must be available - there is no fallback to a compatible version. Version branches must now be named exactly like the version they contain to be considered for a deployment.</li>
+		<li>Deployer is now stricter with versions: When creating a Repository Application Status, the exact version requested must be available - there is no fallback to a compatible version. Version branches must now be named exactly like the version they contain to be considered for a deployment.</li>
 		<li>IsBranchDeployable() now requires version branches to be named exactly like a semantic version.</li>
 		<li>GetRepoDependencyTree() now strictly requires one of the provided versions on level one.</li>
 		<li>SourceControlAPI::ParseRepoUrl() now decodes url components when parsing an AzureDevOps repository url - e.g., to consider organization, project and repo names containing spaces and other special characters.</li>
@@ -383,7 +399,7 @@
 		<li>The Deployment Task form now reloads when the status changes to update the UI Action buttons.</li> 
 		<li>The Deployer - Repository Viewer page was not displayed properly when using Polaris dark theme. This has been fixed.</li>
 		<li>The display value of a "Repository Application Status" now indicates that the date/time is in UTC.</li> 
-		<li>Modified ATF test for GetLatestRepoDependencyList() to avoid test flakyness.</li>
+		<li>Modified ATF test for GetLatestRepoDependencyList() to avoid test flakiness.</li>
 	</ol>	
 	
 	<h3>1.9.1 - 2024-02-15</h3>
@@ -399,7 +415,7 @@
 		<li>Deployer 1.9.0 requires the same version or higher on the target instance due to the newly introduced identification of data deletion.</li>
 		<li>DevTools 1.81.0 is now required because of GetAppDefaultTestSuite().</li>
 		<li>A repository application status can now be established for the current state in a dev branch.</li>
-		<li>Deployment Tasks to run CodeSanity checks and ATF test suites now contain a link to the results on the target instance.</li>
+		<li>Deployment Tasks to run CodeSanity checks, and ATF test suites now contain a link to the results on the target instance.</li>
 		<li>The checkbox "Enforce Downgrade" on the Deployment form was not read-only by default. This has been fixed.</li>
 		<li>The "Prepare" button is now hidden if no instance has been selected yet for a deployment.</li>
 		<li>The "Run Installation Scripts" REST API endpoint no longer requires the "async" parameter - to ensure full backward compatibility.</li>
@@ -519,14 +535,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2023-02-24 10:04:44</sys_created_on>
         <sys_id>cb800c901b1965105b76777d8b4bcb0a</sys_id>
-        <sys_mod_count>302</sys_mod_count>
+        <sys_mod_count>325</sys_mod_count>
         <sys_name>manual</sys_name>
         <sys_package display_value="Deployer" source="x_snc_deployer">394148f9db1c2d906a03dad1f396197a</sys_package>
         <sys_policy/>
         <sys_scope display_value="Deployer">394148f9db1c2d906a03dad1f396197a</sys_scope>
         <sys_update_name>sys_ui_page_cb800c901b1965105b76777d8b4bcb0a</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-09-15 14:08:46</sys_updated_on>
+        <sys_updated_on>2025-10-13 14:40:21</sys_updated_on>
     </sys_ui_page>
     <sys_es_latest_script action="INSERT_OR_UPDATE">
         <id>cb800c901b1965105b76777d8b4bcb0a</id>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json,application/xml,text/xml</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl/>
+        <http_method>GET</http_method>
+        <name>Start Deployment</name>
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+
+	var GetBoolValue = x_snc_devtools.GetBoolValue;
+	var IsValidSysId = x_snc_devtools.IsValidSysId
+	var GetStringValue = x_snc_devtools.GetStringValue;
+	var IsValidRecord = x_snc_devtools.IsValidRecord;
+	var IsValidUrl = x_snc_devtools.IsValidUrl;
+	var IsUserHasRoleExactly = x_snc_devtools.IsUserHasRoleExactly;
+				
+	function GetParam(strParam)
+	{
+		var queryParams = request.queryParams;
+		return x_snc_devtools.GetValue(queryParams,strParam);
+	}
+	
+	function Error(strMessage,strDetails)
+	{
+		var myError = new sn_ws_err.ServiceError();
+		myError.setStatus(200);
+		myError.setMessage(strMessage);
+		myError.setDetail(strDetails);
+		response.setError(myError);	
+	}
+
+	if (IsUserHasRoleExactly('x_snc_deployer.api_controller') == false)
+	{
+		Error('User Not Authorized','');
+		return;
+	}
+
+	if (IsActive() == false)
+	{
+		Error('INACTIVE','The Deployer app is inactive.');
+		return;
+	}
+	
+	var strInstance = GetStringValue(GetParam('instance'));
+	var strRepoUrl = GetStringValue(GetParam('repo_url'));
+	var strBranch = GetStringValue(GetParam('branch'));
+	
+	if (strInstance == '')
+	{
+		Error('INSTANCE_NOT_SPECIFIED','No instance has been specified!');
+		return;
+	}
+
+
+	var grInstance = GetInstanceRecord(strInstance);
+	if (IsValidRecord(grInstance) == false)
+	{
+		Error('INSTANCE_NOT_FOUND','The specified Instance (configuration) cannot be found!');
+		return;
+	}
+
+	if (strRepoUrl == '')
+	{
+		Error('REPO_URL_NOT_SPECIFIED','No repository URL is specified!');
+		return;
+	}
+
+
+	if (IsValidUrl(strRepoUrl) == false)
+	{
+		Error('REPO_URL_INVALID','The specified Repository URL is invalid!');
+		return;
+	}
+	
+	if (strBranch == '')
+	{
+		Error('BRANCH_NOT_SPECIFIED','No branch is specified!');
+		return;
+	}
+	
+	
+	var strProgressName = 'Performing headless deployment on instance: '+grInstance.name;
+
+	var params = {};
+	params['strInstance'] = strInstance;
+	params['strRepoUrl'] = strRepoUrl;
+	params['strBranch'] = strBranch;
+	var strWorkerId = x_snc_devtools.StartWorker(
+		strProgressName,
+		'x_snc_deployer.DeployerWorkerAPI',
+		'HeadlessDeployment',
+		params);	
+	
+	if (IsValidSysId(strWorkerId) == false)
+	{
+		Error('ASYNC_START_FAILED','Failed to start headless deployment asynchronously!');
+		return;
+	}
+		
+	var body = {};
+	body.message = 'SUCCESS';
+	body.detail = 'Started headless deployment.';
+	body.progress_id = strWorkerId;
+	response.setBody(body);
+	
+	return;
+
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_snc_deployer/controller/start_deployment</operation_uri>
+        <produces>application/json,application/xml,text/xml</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/start_deployment</relative_path>
+        <request_example/>
+        <requires_acl_authorization>true</requires_acl_authorization>
+        <requires_authentication>true</requires_authentication>
+        <requires_snc_internal_role>true</requires_snc_internal_role>
+        <short_description>Starts a deployment to the given instance based on a repository url and branch.</short_description>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-10-06 12:44:19</sys_created_on>
+        <sys_id>474b22233bdc325062bf612c95e45a2f</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>Start Deployment</sys_name>
+        <sys_package display_value="Deployer" source="x_snc_deployer">394148f9db1c2d906a03dad1f396197a</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Deployer">394148f9db1c2d906a03dad1f396197a</sys_scope>
+        <sys_update_name>sys_ws_operation_474b22233bdc325062bf612c95e45a2f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-10-10 08:13:07</sys_updated_on>
+        <web_service_definition display_value="Deployer Controller API">36fae2af3b9c325062bf612c95e45aa6</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>474b22233bdc325062bf612c95e45a2f</id>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-10-06 12:44:19</sys_created_on>
+        <sys_id>7f5b62233bdc325062bf612c95e45afb</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-10-06 12:44:19</sys_updated_on>
+        <table>sys_ws_operation</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>
